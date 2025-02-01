@@ -51,34 +51,64 @@ struct ContentView: View {
     var body: some View {
         
         NavigationStack {
-            List{
-                ForEach(expenses.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
+            VStack {
+                List{
+                    Section ("Personal") {
+                        ForEach(expenses.items) { item in
+                            addRow(name: item.name, type: item.type, amount: item.amount)
                         }
-                        Spacer()
-                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        .onDelete(perform: removeItems)
                     }
+                    
+
                 }
-                .onDelete(perform: removeItems)
-            }
-            .navigationTitle("iExpenses")
-            .toolbar {
+                .navigationTitle("iExpenses")
+                .sheet(isPresented: $showingAddExpense) {
+                    AddView(expenses: expenses)
+                }
                 Button("Add Expense", systemImage: "plus") {
                     showingAddExpense.toggle()
                 }
-            }
-            .sheet(isPresented: $showingAddExpense) {
-                AddView(expenses: expenses)
             }
         }
     }
     
     func removeItems(at offsets: IndexSet) {
         expenses.items.remove(atOffsets: offsets)
+    }
+    func addRow(name: String, type: String, amount: Double) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(name)
+                    .font(.headline)
+                Text(type)
+            }
+            Spacer()
+            
+            Text(amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                .foregroundStyle(styleForAmount(amount))
+                .fontWeight(styleFontWeight(amount))
+        }
+    }
+    
+    func styleForAmount(_ amount: Double) -> Color {
+        if amount <= 100 {
+            return .green // Red for amounts under $10
+        } else if amount <= 1000 {
+            return .blue // Blue for amounts under $100
+        } else {
+            return .red // Green for amounts over $100
+        }
+    }
+    
+    func styleFontWeight(_ amount: Double) -> Font.Weight {
+        if amount < 10 {
+            return .light // Bold for amounts under $10
+        } else if amount < 100 {
+            return .regular // Regular for amounts under $100
+        } else {
+            return .bold // Light for amounts over $100
+        }
     }
 }
 
