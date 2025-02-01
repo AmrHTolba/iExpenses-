@@ -17,10 +17,11 @@ class Expenses {
 
 // MARK: - Structs
 
-struct ExpenseItem {
-    var name: String
-    var type: String
-    var amount: Double
+struct ExpenseItem: Identifiable {
+    let id = UUID()
+    let name: String
+    let type: String
+    let amount: Double
 }
 
 // MARK: - Content View
@@ -34,7 +35,7 @@ struct ContentView: View {
         
         NavigationStack {
             List{
-                ForEach(expenses.item, id: \.name) { item in
+                ForEach(expenses.item) { item in
                     Text(item.name)
                 }
                 .onDelete(perform: removeItems)
