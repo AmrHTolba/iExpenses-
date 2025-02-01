@@ -12,13 +12,29 @@ import Observation
 
 @Observable
 class Expenses {
-    var item = [ExpenseItem]()
+    init() {
+        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+            if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
+                items = decodedItems
+                return
+            }
+        }
+        items = []
+    }
+    
+    var items = [ExpenseItem]() {
+        didSet {
+            if let encoded  = try? JSONEncoder().encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
+            }
+        }
+    }
 }
 
 // MARK: - Structs
 
-struct ExpenseItem: Identifiable {
-    let id = UUID()
+struct ExpenseItem: Identifiable, Codable {
+    var id = UUID()
     let name: String
     let type: String
     let amount: Double
@@ -36,8 +52,16 @@ struct ContentView: View {
         
         NavigationStack {
             List{
-                ForEach(expenses.item) { item in
-                    Text(item.name)
+                ForEach(expenses.items) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        Spacer()
+                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                    }
                 }
                 .onDelete(perform: removeItems)
             }
@@ -48,13 +72,13 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingAddExpense) {
-                AddView()
+                AddView(expenses: expenses)
             }
         }
     }
     
     func removeItems(at offsets: IndexSet) {
-        expenses.item.remove(atOffsets: offsets)
+        expenses.items.remove(atOffsets: offsets)
     }
 }
 
