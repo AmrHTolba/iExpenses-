@@ -12,7 +12,8 @@ struct AddView: View {
     // MARK: - Variables
     @State private var name = ""
     @State private var type = "Personal"
-    @State private var amount = 0.0
+    @State private var amount:Double = 0
+    let characterLimit = 15
     
     @Environment(\.dismiss) var dismiss
     
@@ -24,6 +25,11 @@ struct AddView: View {
         NavigationStack {
             Form {
                 TextField("Name", text:$name)
+                    .onChange(of: name) {
+                        if name.count > characterLimit {
+                            name = String(name.prefix(characterLimit))
+                        }
+                    }
                 
                 Picker("Type", selection: $type) {
                     ForEach(types, id: \.self) {
@@ -32,6 +38,7 @@ struct AddView: View {
                 }
                 
                 TextField("Amount", value: $amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                    .keyboardType(.decimalPad)
             }
             .navigationTitle("Add New Expense")
             .toolbar {
