@@ -8,70 +8,51 @@
 import SwiftUI
 import Observation
 
-// MARK: - Class
+// MARK: - Classes
 
 @Observable
-class User {
-    var firstName = ""
-    var lastName = ""
+class Expenses {
+    var item = [ExpenseItem]()
 }
 
-
 // MARK: - Structs
+
+struct ExpenseItem {
+    var name: String
+    var type: String
+    var amount: Double
+}
+
+// MARK: - Content View
 
 struct ContentView: View {
     
     // MARK: - Variables
-    @State private var numbers = [Int]()
-    @State private var currentNumber = 1
-    @State private var user = User()
-    @State private var showingSheet = false
+    @State private var expenses = Expenses()
     
     var body: some View {
         
         NavigationStack {
-            VStack {
-                List {
-                    ForEach(numbers, id: \.self) {
-                        Text("Row \($0)")
-                    }
-                    .onDelete(perform: removeRows)
+            List{
+                ForEach(expenses.item, id: \.name) { item in
+                    Text(item.name)
                 }
-                Button("Add Number") {
-                    numbers.append(currentNumber)
-                    currentNumber += 1
-                }
+                .onDelete(perform: removeItems)
             }
+            .navigationTitle("iExpenses")
             .toolbar {
-                EditButton()
+                Button("Add Expense", systemImage: "plus") {
+                        let expense = ExpenseItem(name: "New Expense", type: "Food", amount: 100.0)
+                        expenses.item.append(expense)
+                }
             }
         }
-//        Button("Show New View") {
-//            showingSheet.toggle()
-//        }
-//        .sheet(isPresented: $showingSheet) {
-//            SecondView(name: "Hah noob")
-//        }
     }
     
-    func removeRows(at offsets: IndexSet) {
-        numbers.remove(atOffsets: offsets)
+    func removeItems(at offsets: IndexSet) {
+        expenses.item.remove(atOffsets: offsets)
     }
 }
-
-
-//struct SecondView: View {
-//    
-//    let name: String
-//    @Environment(\.dismiss) var dismiss
-//    
-//    var body: some View {
-//        Text("You wrote: \(name)")
-//        Button("Dismiss") {
-//            dismiss()
-//        }
-//    }
-//}
 
 #Preview {
     ContentView()
