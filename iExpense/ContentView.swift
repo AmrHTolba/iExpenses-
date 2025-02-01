@@ -30,6 +30,7 @@ struct ContentView: View {
     
     // MARK: - Variables
     @State private var expenses = Expenses()
+    @State private var showingAddExpense = false
     
     var body: some View {
         
@@ -43,9 +44,11 @@ struct ContentView: View {
             .navigationTitle("iExpenses")
             .toolbar {
                 Button("Add Expense", systemImage: "plus") {
-                        let expense = ExpenseItem(name: "New Expense", type: "Food", amount: 100.0)
-                        expenses.item.append(expense)
+                    showingAddExpense.toggle()
                 }
+            }
+            .sheet(isPresented: $showingAddExpense) {
+                AddView()
             }
         }
     }
