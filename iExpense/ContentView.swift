@@ -71,7 +71,7 @@ struct ContentView: View {
                 .sheet(isPresented: $showingAddExpense) {
                     AddView(expenses: expenses)
                 }
-                Button("Add Expense", systemImage: "plus") {
+                Button("Add expense", systemImage: "plus") {
                     showingAddExpense.toggle()
                 }
             }
@@ -118,7 +118,7 @@ struct ContentView: View {
         } else if amount < 100 {
             return .regular //
         } else {
-            return .bold 
+            return .bold
         }
     }
 }
