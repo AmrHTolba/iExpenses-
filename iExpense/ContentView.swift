@@ -54,13 +54,18 @@ struct ContentView: View {
             VStack {
                 List{
                     Section ("Personal") {
-                        ForEach(expenses.items) { item in
+                        ForEach(expenses.items.filter {$0.type == "Personal"}) { item in
                             addRow(name: item.name, type: item.type, amount: item.amount)
                         }
-                        .onDelete(perform: removeItems)
+                        .onDelete{ indexSet in removeItems(at: indexSet, ofType: "Personal")}
                     }
                     
-
+                    Section ("Business") {
+                        ForEach(expenses.items.filter {$0.type == "Business"}) { item in
+                            addRow(name: item.name, type: item.type, amount: item.amount)
+                        }
+                        .onDelete{ indexSet in removeItems(at: indexSet, ofType: "Business")}
+                    }
                 }
                 .navigationTitle("iExpenses")
                 .sheet(isPresented: $showingAddExpense) {
@@ -73,8 +78,14 @@ struct ContentView: View {
         }
     }
     
-    func removeItems(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    func removeItems(at offsets: IndexSet, ofType type: String) {
+        if type == "Personal" {
+            expenses.items.remove(atOffsets: offsets)
+        }
+        else if type == "Business" {
+            expenses.items.remove(atOffsets: offsets)
+        }
+        
     }
     func addRow(name: String, type: String, amount: Double) -> some View {
         HStack {
@@ -93,21 +104,21 @@ struct ContentView: View {
     
     func styleForAmount(_ amount: Double) -> Color {
         if amount <= 100 {
-            return .green // Red for amounts under $10
+            return .green
         } else if amount <= 1000 {
-            return .blue // Blue for amounts under $100
+            return .blue
         } else {
-            return .red // Green for amounts over $100
+            return .red
         }
     }
     
     func styleFontWeight(_ amount: Double) -> Font.Weight {
         if amount < 10 {
-            return .light // Bold for amounts under $10
+            return .light
         } else if amount < 100 {
-            return .regular // Regular for amounts under $100
+            return .regular //
         } else {
-            return .bold // Light for amounts over $100
+            return .bold 
         }
     }
 }
